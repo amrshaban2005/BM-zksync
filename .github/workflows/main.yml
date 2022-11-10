@@ -1,0 +1,52 @@
+name: "CI"
+
+on:
+  pull_request:
+    types:
+      - ready_for_review
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+
+      - name: Install packages
+        run: npm install
+
+      - name: Run private network - ETH
+        run: npm run private-network-no-limit > /dev/null &
+
+      - name: Run migrations - ETH
+        run: npm run deploy-dev
+
+      - name: Run tests - ETH
+        run: npm run test-no-deploy
+
+      - name: Run private network - BSC
+        run: npm run private-network-no-limit-bsc > /dev/null &
+
+      - name: Run migrations - BSC
+        run: npm run deploy-dev-bsc
+
+      - name: Run tests - BSC
+        run: npm run test-no-deploy
+
+      - name: Run private network - POLYGON
+        run: npm run private-network-no-limit-pol > /dev/null &
+
+      - name: Run migrations - POLYGON
+        run: npm run deploy-dev-pol
+
+      - name: Run tests - POLYGON
+        run: npm run test-no-deploy
+
+      # - name: Stop private network
+      #   run: kill $(lsof -t -i:8545)
